@@ -1,0 +1,44 @@
+#!/bin/bash
+#
+#	main
+#
+
+cd ~/.kozukai
+
+while : ; do
+	dialog \
+		--backtitle "KOZUKAI" \
+		--title "main menu" \
+		--cancel-label "QUIT" \
+		--menu "" 0 0 0 \
+			"a" "伝票入力(本日分)" \
+			"b" "伝票入力(本日分:クレカで買物)" \
+			"c" "伝票入力(昨日分)" \
+			"d" "伝票入力(昨日分:クレカで買物)" \
+			"e" "伝票入力" \
+			"f" "ステートメント照会" \
+			"g" "伝票照会" \
+			"h"	"勘定コード表照会" \
+			"i"	"クレジットカード支払確定" \
+			"j"	"勘定残高推移表" \
+			"k"	"住宅ローン支払" \
+		2> stderr_file
+	rtn=$?
+	choice=$(cat stderr_file)
+	case "${choice}" in
+		"a") ./bin/newslip.wrapper.partial today ;;
+		"b") ./bin/newslip.wrapper.partial today a1 aba2 ;;
+		"c") ./bin/newslip.wrapper.partial yesterday ;;
+		"d") ./bin/newslip.wrapper.partial yesterday a1 aba2 ;;
+		"e") ./bin/newslip ;;
+		"f") open -a "Terminal" ./bin/viewstatement ;;
+		"g") open -a "Terminal" ./bin/viewtranview ;;
+		"h") open -a "Terminal" ./bin/viewac ;;
+		"i") ./bin/creditcard.payment ;;
+		"j") open -a "Terminal" ./bin/balancetracer.wrapper ;;
+		"k") ./bin/houseloan ;;
+	esac
+	[ ${rtn} = 1 ] && exit	# Ctrl + C
+	[ ${rtn} = 255 ] && exit # QUIT
+
+done
